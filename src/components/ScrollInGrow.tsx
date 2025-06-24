@@ -17,7 +17,7 @@ export default function ScrollInGrow({ children, onScrollIn, onScrollOut, ...pro
     const section = sectionRef.current;
 
     const options: IntersectionObserverInit = {
-      threshold: 0.05
+      threshold: 0.1
     };
 
     const observer = new IntersectionObserver((entries) => {
