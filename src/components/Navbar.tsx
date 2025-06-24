@@ -78,9 +78,6 @@ export default function AppNavBar() {
               <StyledButton LinkComponent={CustomLink} variant="text" color="primary" size="small" href="/#contact">
                 Contact
               </StyledButton>
-              <StyledButton LinkComponent={CustomLink} variant="text" color="primary" size="small" href="/blog">
-                Blog
-              </StyledButton>
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none'}}}>
               <Typography variant="body1" color="textPrimary" sx={{lineHeight: 1}} fontSize="medium">menma.dev_</Typography>
@@ -129,7 +126,6 @@ export default function AppNavBar() {
                 <MenuItem component="a" href="/#tech" onClick={toggleDrawer(false)}>Tech Experience</MenuItem>
                 <MenuItem component="a" href="/#projects" onClick={toggleDrawer(false)}>Projects</MenuItem>
                 <MenuItem component="a" href="/#contact" onClick={toggleDrawer(false)}>Contact</MenuItem>
-                <MenuItem component="a" href="/blog" onClick={toggleDrawer(false)}>Blog</MenuItem>
 
                 <Divider sx={{ my: 3 }} />
 

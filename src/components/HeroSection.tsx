@@ -1,5 +1,4 @@
 import { Box, Button, Stack, Container, Grow, Typography } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CustomLink from './CustomLink';
 
 export default function HeroSection() {
@@ -35,9 +34,6 @@ export default function HeroSection() {
             <Stack direction="row" spacing={2}>
               <Button LinkComponent={CustomLink} variant="contained" color="primary" href="/#about">
                 Learn More
-              </Button>
-              <Button variant="outlined" href="/resume.pdf" target="_blank" endIcon={<OpenInNewIcon />}>
-                Download Resume
               </Button>
             </Stack>
           </Stack>
