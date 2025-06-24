@@ -24,6 +24,7 @@ const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<"a">>(
         return true;
       } else if(window.scrollY > window.innerHeight * 0.1) {
         window.scrollTo({ top: 0, behavior: "smooth" });
+        window.history.replaceState(null, "", "/");
         return true;
       }
 
