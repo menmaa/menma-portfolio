@@ -1,6 +1,6 @@
 "use client";
 
-import { Grow, GrowProps } from "@mui/material";
+import { Container, Grow, GrowProps } from "@mui/material";
 import React from "react";
 
 type ScrollInGrowProps = GrowProps & {
@@ -38,5 +38,9 @@ export default function ScrollInGrow({ children, onScrollIn, onScrollOut, ...pro
     };
   }, [onScrollIn, onScrollOut]);
 
-  return <div ref={sectionRef}><Grow {...props} in={isVisible}>{children}</Grow></div>;
+  return (
+    <Container ref={sectionRef}>
+      <Grow {...props} in={isVisible}>{children}</Grow>
+    </Container>
+  );
 }

@@ -18,14 +18,12 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.1 /lambda-adapter /opt/extensions/lambda-adapter
-
-ENV PORT=3000 NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+ENV PORT=3000 NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 EXPOSE 3000
 
 CMD ["node", "server.js"]

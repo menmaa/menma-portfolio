@@ -1,5 +1,6 @@
-import { Box, Button, Stack, Container, Grow, Typography } from '@mui/material';
+import { Box, Button, Stack, Container, Typography } from '@mui/material';
 import CustomLink from './CustomLink';
+import ScrollInGrow from './ScrollInGrow';
 
 export default function HeroSection() {
   return (
@@ -14,7 +15,7 @@ export default function HeroSection() {
         color: 'text.primary'
       }}
     >
-      <Grow in={true}>
+      <ScrollInGrow>
         <Container maxWidth="md">
           <Stack spacing={4} alignItems="flex-start">
             <Typography variant="h2" fontWeight={700}>
@@ -38,7 +39,7 @@ export default function HeroSection() {
             </Stack>
           </Stack>
         </Container>
-      </Grow>
+      </ScrollInGrow>
     </Box>
   );
 }
