@@ -48,6 +48,9 @@ jobs:
           docker build -t $IMAGE_URI ./app
           docker push $IMAGE_URI
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Initialize and Deploy Terraform
         run: |
           cd terraform
