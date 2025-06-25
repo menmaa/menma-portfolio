@@ -10,6 +10,14 @@ terraform {
       version = "~> 4"
     }
   }
+
+  backend "s3" {
+    bucket = "menma-portfolio-terraform"
+    key = "state/terraform.tfstate"
+    region = "eu-central-1"
+    encrypt = true
+    dynamodb_table = "MenmaPortfolioTerraformLockId"
+  }
 }
 
 provider "aws" {
