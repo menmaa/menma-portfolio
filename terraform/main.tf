@@ -17,7 +17,7 @@ resource "aws_lambda_function" "menmaportfolio" {
   image_uri     = var.image_uri
   timeout       = 30
   memory_size   = 512
-  architectures = ["amd64"]
+  architectures = ["x86_64"]
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
