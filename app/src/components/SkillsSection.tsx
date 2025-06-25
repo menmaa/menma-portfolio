@@ -69,16 +69,15 @@ const categories: SkillCategory[] = [
       { name: 'MongoDB' },
       { name: 'SQL Server' },
       { name: 'Aurora RDS (AWS)' },
-      { name: 'Redis' },
-      { name: 'Valkey' },
+      { name: 'Redis' }
     ]
   },
   {
     title: 'Cloud',
     entries: [
-      { name: 'AWS (EC2, ECS, VPC, S3, ELB(ALB/NLB), API Gateway, Aurora RDS, ElastiCache)' },
+      { name: 'AWS (EC2, ECS, VPC, S3, ELB(ALB/NLB), API Gateway, Aurora RDS, ElastiCache, Lambda, IAM)' },
       { name: 'Azure (Virtual Machines, App Services, Static Web Apps, Storage Accounts)' },
-      { name: 'Cloudflare (CDN, R2, Stream, Pages)' }
+      { name: 'Cloudflare (DNS, CDN, R2, Stream, Pages)' }
     ]
   },
   {
@@ -104,7 +103,8 @@ const categories: SkillCategory[] = [
       { name: "Git (GitHub)" },
       { name: "CI/CD (Github Actions)" },
       { name: "Agile (Jira, Azure DevOps, Trello)" },
-      { name: "Unit/Integration Testing (Jest, Vitest, Postman)" }
+      { name: "Unit/Integration Testing (Jest, Vitest, Postman)" },
+      { name: "Terraform" }
     ]
   }
 ];
