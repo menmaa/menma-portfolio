@@ -38,6 +38,7 @@ jobs:
           echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
 
       - name: Retrieve required secrets from AWS Secrets Manager
+        id: get_secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: arn:aws:secretsmanager:eu-central-1:401821118684:secret:***REMOVED***-KnKedI
@@ -59,5 +60,5 @@ jobs:
             -var 'image_uri=$IMAGE_URI' \
             -var 'domain_name=$DOMAIN_NAME' \
             -var 'cloudflare_zone_id=$CLOUDFLARE_ZONE_ID' \
-            -var 'cloudflare_api_key=$CLOUDFLARE_API_KEY' \
+            -var 'cloudflare_api_key=${{ env.MENMAPORTFOLIOKEYS_CLOUDFLARE_API_KEY }}' \
             -auto-approve
