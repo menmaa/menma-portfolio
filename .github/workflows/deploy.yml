@@ -58,7 +58,7 @@ jobs:
           terraform init
           terraform apply \
             -var 'image_uri=$IMAGE_URI' \
-            -var 'domain_name=$DOMAIN_NAME' \
-            -var 'cloudflare_zone_id=$CLOUDFLARE_ZONE_ID' \
+            -var 'domain_name=${{ env.DOMAIN_NAME }}' \
+            -var 'cloudflare_zone_id=${{ env.CLOUDFLARE_ZONE_ID }}' \
             -var 'cloudflare_api_key=${{ env.MENMAPORTFOLIOKEYS_CLOUDFLARE_API_KEY }}' \
             -auto-approve
