@@ -3,16 +3,21 @@ name: Build Image and Deploy to Lambda
 on:
   push:
     branches: [master]
+  workflow_dispatch:
 
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY_NAME: menma-portfolio
-  DOMAIN_NAME: preview.menma.dev
-  CLOUDFLARE_ZONE_ID: f6c90d0c7226fc41d698fdd12a660ddb
+  DOMAIN_NAME: menma.dev
+  CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
+  CLOUDFLARE_API_SECRET: ${{ secrets.CLOUDFLARE_API_SECRET }}
+  TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+  HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+    environment: production
 
     permissions:
       id-token: write
@@ -37,17 +42,37 @@ jobs:
         run: |
           echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
 
-      - name: Retrieve required secrets from AWS Secrets Manager
-        id: get_secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@v2
-        with:
-          secret-ids: arn:aws:secretsmanager:eu-central-1:401821118684:secret:***REMOVED***-KnKedI
-          parse-json-secrets: true
-
       - name: Build Docker Image
         run: |
-          docker build -t $IMAGE_URI ./app
+          docker build -t $IMAGE_URI --secret id=TURNSTILE_SITE_KEY --secret id=HCAPTCHA_SITE_KEY ./app
           docker push $IMAGE_URI
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ***REMOVED***
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set ECR image URI
+        run: |
+          echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v3
@@ -57,8 +82,8 @@ jobs:
           cd terraform
           terraform init
           terraform apply \
-            -var 'image_uri=$IMAGE_URI' \
+            -var 'image_uri=${{ env.IMAGE_URI }}' \
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
             -var 'cloudflare_zone_id=${{ env.CLOUDFLARE_ZONE_ID }}' \
-            -var 'cloudflare_api_key=${{ env.MENMAPORTFOLIOKEYS_CLOUDFLARE_API_KEY }}' \
+            -var 'cloudflare_api_key=${{ env.CLOUDFLARE_API_SECRET }}' \
             -auto-approve
