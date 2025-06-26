@@ -10,9 +10,24 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
+resource "aws_iam_role_policy" "cloudwatch_policy" {
+  name = "MenmaPortfolioLambdaExecPermissions"
   role = aws_iam_role.lambda_exec.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "ses:SendEmail"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
 }
 
 resource "aws_lambda_function" "menmaportfolio" {
