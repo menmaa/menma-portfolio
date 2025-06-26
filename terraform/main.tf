@@ -11,7 +11,7 @@ resource "aws_iam_role" "lambda_exec" {
 }
 
 resource "aws_lambda_function" "menmaportfolio" {
-  function_name = "MenmaPortfolioFunctionV2"
+  function_name = "MenmaPortfolioFunction"
   role          = aws_iam_role.lambda_exec.arn
   package_type  = "Image"
   image_uri     = var.image_uri
@@ -21,7 +21,7 @@ resource "aws_lambda_function" "menmaportfolio" {
 }
 
 resource "aws_apigatewayv2_api" "http_api" {
-  name          = "MenmaPortfolioFunctionAPIV2"
+  name          = "MenmaPortfolioFunctionAPI"
   protocol_type = "HTTP"
 }
 
