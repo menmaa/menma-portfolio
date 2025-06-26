@@ -1,9 +1,11 @@
 "use server";
 
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { SESv2Client, SendEmailCommand, SendEmailCommandInput } from '@aws-sdk/client-sesv2';
 import z from 'zod/v4';
 
 type SchemaErrorType = "INVALID_REQUEST_BODY" | "CHALLENGE_VERIFICATION_FAILED" | "INTERNAL_SERVER_ERROR";
+type SecretType = 'TURNSTILE_SECRET' | 'HCAPTCHA_SECRET';
 
 export type ContactState = {
     success?: boolean;
@@ -25,6 +27,8 @@ const formSchema = z.object({
 });
 
 const sesClient = new SESv2Client({ region: process.env.AWS_REGION });
+let turnstileSecret = process.env.TURNSTILE_SECRET;
+let hcaptchaSecret = process.env.HCAPTCHA_SECRET;
 
 export async function contact(currentState: ContactState | null, formData: FormData): Promise<ContactState> {
     try {
@@ -86,12 +90,12 @@ export async function contact(currentState: ContactState | null, formData: FormD
 }
 
 export async function verifyTurnstileResponse(response: string, ipAddress?: string): Promise<boolean> {
-    if (!process.env.TURNSTILE_SECRET) {
-        throw new Error("Missing TURNSTILE_SECRET");
+    if (!turnstileSecret) {
+        turnstileSecret = await retrieveSecrets('TURNSTILE_SECRET');
     }
 
     const searchParams = new URLSearchParams();
-    searchParams.append('secret', process.env.TURNSTILE_SECRET);
+    searchParams.append('secret', turnstileSecret);
     searchParams.append('response', response);
     if (ipAddress) searchParams.append('remoteip', ipAddress);
 
@@ -108,12 +112,12 @@ export async function verifyTurnstileResponse(response: string, ipAddress?: stri
 }
 
 export async function verifyHCaptchaResponse(response: string, ipAddress?: string): Promise<boolean> {
-    if (!process.env.HCAPTCHA_SECRET) {
-        throw new Error("Missing HCAPTCHA_SECRET");
+    if (!hcaptchaSecret) {
+        hcaptchaSecret = await retrieveSecrets('HCAPTCHA_SECRET');
     }
 
     const searchParams = new URLSearchParams();
-    searchParams.append('secret', process.env.HCAPTCHA_SECRET);
+    searchParams.append('secret', hcaptchaSecret);
     searchParams.append('response', response);
     if (ipAddress) searchParams.append('remoteip', ipAddress);
 
@@ -127,4 +131,25 @@ export async function verifyHCaptchaResponse(response: string, ipAddress?: strin
     const data = await res.json();
 
     return data.success;
+}
+
+async function retrieveSecrets(secret: SecretType): Promise<string> {
+    const region = process.env.AWS_REGION;
+
+    if(!region) {
+        throw new Error('AWS_REGION not provided');
+    }
+
+    const client = new SecretsManagerClient({ region });
+    const data = await client.send(new GetSecretValueCommand({ SecretId: '***REMOVED***' }));
+
+    if('SecretString' in data) {
+        const secrets = JSON.parse(data.SecretString as string);
+        if(!secrets[secret]) {
+            throw new Error(`AWS Secrets missing TURNSTILE_SECRET entry.`);
+        }
+        return secrets[secret];
+    }
+
+    throw new Error('Failed to retrieve AWS Secret String');
 }
