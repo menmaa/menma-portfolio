@@ -146,7 +146,7 @@ async function retrieveSecrets(secret: SecretType): Promise<string> {
     if('SecretString' in data) {
         const secrets = JSON.parse(data.SecretString as string);
         if(!secrets[secret]) {
-            throw new Error(`AWS Secrets missing TURNSTILE_SECRET entry.`);
+            throw new Error(`AWS Secrets missing ${secret} entry.`);
         }
         return secrets[secret];
     }
