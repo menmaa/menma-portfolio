@@ -1,3 +1,8 @@
+data "aws_ecr_image" "menma_portfolio_image" {
+  repository_name = var.image_repository
+  image_tag = var.image_tag
+}
+
 resource "aws_iam_role" "lambda_exec" {
   name = "MenmaPortfolioExecRole"
   assume_role_policy = jsonencode({
@@ -34,7 +39,7 @@ resource "aws_lambda_function" "menmaportfolio" {
   function_name = "MenmaPortfolioFunction"
   role          = aws_iam_role.lambda_exec.arn
   package_type  = "Image"
-  image_uri     = var.image_uri
+  image_uri     = data.aws_ecr_image.menma_portfolio_image.image_uri
   timeout       = 30
   memory_size   = 512
   architectures = ["x86_64"]

@@ -1,5 +1,10 @@
-variable "image_uri" {
-  description = "The URI of the docker image in ECR"
+variable "image_repository" {
+  description = "The repository name of the docker image in ECR"
+  type        = string
+}
+
+variable "image_tag" {
+  description = "The image tag in ECR (e.g.: latest)"
   type        = string
 }
 

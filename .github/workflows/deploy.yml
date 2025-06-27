@@ -6,6 +6,7 @@ on:
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY_NAME: menma-portfolio
+  ECR_IMAGE_TAG: latest
   DOMAIN_NAME: menma.dev
   CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
   CLOUDFLARE_API_SECRET: ${{ secrets.CLOUDFLARE_API_SECRET }}
@@ -38,7 +39,8 @@ jobs:
       - name: Set ECR image URI
         id: ecr
         run: |
-          echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
+          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:${{ env.ECR_IMAGE_TAG }}
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
 
       - name: Build Docker Image
         run: |
@@ -58,29 +60,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ***REMOVED***
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Set ECR image URI
-        run: |
-          echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
-
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Initialize and Deploy Terraform
         run: |
           cd terraform
           terraform init
           terraform apply \
-            -var 'image_uri=${{ env.IMAGE_URI }}' \
+            -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
+            -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
             -var 'cloudflare_zone_id=${{ env.CLOUDFLARE_ZONE_ID }}' \
             -var 'cloudflare_api_key=${{ env.CLOUDFLARE_API_SECRET }}' \
