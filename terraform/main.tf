@@ -1,6 +1,6 @@
 data "aws_ecr_image" "menma_portfolio_image" {
   repository_name = var.image_repository
-  image_tag = var.image_tag
+  image_tag       = var.image_tag
 }
 
 resource "aws_iam_role" "lambda_exec" {
@@ -15,24 +15,22 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-resource "aws_iam_role_policy" "cloudwatch_policy" {
+resource "aws_iam_role_policy" "lambda_exec_policy" {
   name = "MenmaPortfolioLambdaExecPermissions"
   role = aws_iam_role.lambda_exec.name
   policy = jsonencode({
     Version = "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "secretsmanager:GetSecretValue",
-          "ses:SendEmail",
-        ],
-        "Resource" : "*"
-      }
-    ]
+    Statement = [{
+      Effect = "Allow",
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "secretsmanager:GetSecretValue",
+        "ses:SendEmail",
+      ],
+      Resource = "*"
+    }]
   })
 }
 
@@ -131,8 +129,4 @@ resource "cloudflare_record" "apigw_custom_domain_map" {
   content = aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name_configuration[0].target_domain_name
   ttl     = 1
   proxied = true
-}
-
-output "api_url" {
-  value = aws_apigatewayv2_stage.default.invoke_url
 }

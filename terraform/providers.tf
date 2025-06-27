@@ -12,10 +12,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "menma-portfolio-terraform"
-    key = "state/terraform.tfstate"
-    region = "eu-central-1"
-    encrypt = true
+    bucket         = "menma-portfolio-terraform"
+    key            = "state/terraform.tfstate"
+    region         = "eu-central-1"
+    encrypt        = true
     dynamodb_table = "MenmaPortfolioTerraformLockId"
   }
 }
