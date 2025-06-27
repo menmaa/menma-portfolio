@@ -27,7 +27,8 @@ resource "aws_iam_role_policy" "cloudwatch_policy" {
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
-          "ses:SendEmail"
+          "secretsmanager:GetSecretValue",
+          "ses:SendEmail",
         ],
         "Resource" : "*"
       }
