@@ -123,6 +123,7 @@ export default function ContactSection() {
                 label="Your Name"
                 variant="outlined"
                 required
+                value={formData.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={!!formErrors.name}
