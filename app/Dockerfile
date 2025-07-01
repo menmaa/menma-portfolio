@@ -12,8 +12,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN --mount=type=secret,id=TURNSTILE_SITE_KEY,env=NEXT_PUBLIC_TURNSTILE_SITE_KEY \
-    --mount=type=secret,id=HCAPTCHA_SITE_KEY,env=NEXT_PUBLIC_HCAPTCHA_SITE_KEY \
+RUN --mount=type=secret,id=turnstile_site_key,env=NEXT_PUBLIC_TURNSTILE_SITE_KEY \
+    --mount=type=secret,id=hcaptcha_site_key,env=NEXT_PUBLIC_HCAPTCHA_SITE_KEY \
     npm run build
 
 # Production image, copy all the files and run next
