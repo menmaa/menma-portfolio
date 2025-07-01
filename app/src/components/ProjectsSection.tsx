@@ -47,8 +47,8 @@ const projects: Project[] = [
     title: 'Game Statistics Web UI',
     description:
       'An interactive dashboard showing damage statistics, skills used, DPS rankings, and encounter history. Boosted retention and competition.',
-    stack: ['Next.js', 'React', 'MySQL', 'Prisma ORM', 'REST API', 'Docker', 'AWS'],
-    demoUrl: null
+    stack: ['Next.js', 'React', 'Tailwind CSS', 'MySQL', 'Prisma ORM', 'REST API', 'Docker', 'AWS Lambda', 'Cloudflare R2', 'Cloudflare Images'],
+    demoUrl: 'https://moongourd.menma.dev'
   },
   {
     title: 'Internal Developer Tools',
