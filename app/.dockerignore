@@ -1,0 +1,32 @@
+# Ignore version control files
+/.git
+.gitignore
+
+# Ignore vscode settings
+/.vscode
+
+# Ignore node_modules and build artifacts
+/.next
+/node_modules
+
+# Ignore Terraform Configuration files
+/terraform
+
+# Ignore environment variable files
+.env*
+
+# Ignore Docker-related files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Ignore typescript-related files
+*.tsbuildinfo
+next-env.d.ts
+
+# Ignore system related files
+.DS_Store
+Thumbs.db
+
+# Ignore Readme files
+README.md
