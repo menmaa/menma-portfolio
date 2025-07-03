@@ -20,6 +20,7 @@ type Project = {
   stack: string[];
   url?: string;
   demoUrl?: string | null;
+  sourceUrl?: string;
 };
 
 const projects: Project[] = [
@@ -49,6 +50,12 @@ const projects: Project[] = [
       'An interactive dashboard showing damage statistics, skills used, DPS rankings, and encounter history. Boosted retention and competition.',
     stack: ['Next.js', 'React', 'Tailwind CSS', 'MySQL', 'Prisma ORM', 'REST API', 'Docker', 'AWS Lambda', 'Cloudflare R2', 'Cloudflare Images'],
     demoUrl: 'https://moongourd.menma.dev'
+  },
+  {
+    title: 'Menmu Discord Bot',
+    description: 'A simple discord music bot with support for YouTube playback and live streams.',
+    stack: ['Java', 'Discord4j', 'Lavalink', 'YouTube API', 'Docker', 'AWS ECS'],
+    sourceUrl: 'https://github.com/menmaa/MenmuDiscordBot'
   },
   {
     title: 'Internal Developer Tools',
@@ -96,6 +103,16 @@ export default function ProjectsSection() {
                   </CardContent>
 
                   <CardActions>
+                    {project.sourceUrl && <Button
+                      variant="outlined"
+                      LinkComponent={CustomLink}
+                      href={project.sourceUrl}
+                      target="_blank"
+                      rel="noopener"
+                      endIcon={<OpenInNewIcon/>}
+                      fullWidth
+                    >Source Code</Button>}
+                    
                     {project.url && <Button
                       variant="outlined"
                       LinkComponent={CustomLink}
@@ -108,6 +125,7 @@ export default function ProjectsSection() {
                       LinkComponent={CustomLink}
                       href={project.demoUrl}
                       target="_blank"
+                      rel="noopener"
                       endIcon={<OpenInNewIcon/>}
                       fullWidth
                     >Live Demo</Button>}
