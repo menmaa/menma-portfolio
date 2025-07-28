@@ -60,7 +60,7 @@ export async function contact(currentState: ContactState | null, formData: FormD
         }
 
         const body: SendEmailCommandInput = {
-            FromEmailAddress: "\"Menma.dev Contact Form\" <***REMOVED***>",
+            FromEmailAddress: "\"Portfolio Contact Form\" <***REMOVED***>",
             Destination: {
                 ToAddresses: ["***REMOVED***"]
             },

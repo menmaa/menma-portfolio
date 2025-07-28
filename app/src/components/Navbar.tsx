@@ -80,7 +80,7 @@ export default function AppNavBar() {
               </StyledButton>
             </Box>
             <Box sx={{ display: { xs: 'flex', md: 'none'}}}>
-              <Typography variant="body1" color="textPrimary" sx={{lineHeight: 1}} fontSize="medium">menma.dev_</Typography>
+              <Typography variant="body1" color="textPrimary" sx={{lineHeight: 1}} fontSize="medium">Fotis Makris_</Typography>
             </Box>
           </Box>
           <Box

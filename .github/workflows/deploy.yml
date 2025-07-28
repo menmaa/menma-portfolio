@@ -6,10 +6,8 @@ on:
 env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY_NAME: menma-portfolio
-  ECR_IMAGE_TAG: latest
-  DOMAIN_NAME: menma.dev
-  CLOUDFLARE_ZONE_ID: ${{ vars.CLOUDFLARE_ZONE_ID }}
-  CLOUDFLARE_API_SECRET: ${{ secrets.CLOUDFLARE_API_SECRET }}
+  ECR_IMAGE_TAG: fm
+  DOMAIN_NAME: fotismakris.com
   TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
 
@@ -83,6 +81,4 @@ jobs:
             -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
             -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
-            -var 'cloudflare_zone_id=${{ env.CLOUDFLARE_ZONE_ID }}' \
-            -var 'cloudflare_api_key=${{ env.CLOUDFLARE_API_SECRET }}' \
             -auto-approve
