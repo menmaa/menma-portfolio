@@ -4,7 +4,7 @@ data "aws_ecr_image" "fotismakris_portfolio_image" {
 }
 
 data "aws_route53_zone" "custom_domain_zone" {
-  name = var.domain_name
+  name         = var.domain_name
   private_zone = false
 }
 
@@ -100,6 +100,7 @@ resource "aws_route53_record" "domain_validation_record" {
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
+  ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "custom_domain_validation" {
@@ -127,7 +128,8 @@ resource "aws_apigatewayv2_api_mapping" "apigw_mapping" {
 
 resource "aws_route53_record" "apigw_custom_domain_map" {
   zone_id = data.aws_route53_zone.custom_domain_zone.zone_id
-  name = aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name
-  type = "A"
+  name    = aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name
+  type    = "CNAME"
   records = [aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name_configuration[0].target_domain_name]
+  ttl     = 60
 }
