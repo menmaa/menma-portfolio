@@ -85,6 +85,7 @@ resource "aws_lambda_permission" "apigw_invoke" {
 resource "aws_acm_certificate" "custom_domain_cert" {
   domain_name       = var.domain_name
   validation_method = "DNS"
+  region            = "us-east-1"
 }
 
 resource "aws_route53_record" "domain_validation_record" {
@@ -100,36 +101,86 @@ resource "aws_route53_record" "domain_validation_record" {
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
-  ttl     = 60
+  ttl     = 300
 }
 
 resource "aws_acm_certificate_validation" "custom_domain_validation" {
   certificate_arn         = aws_acm_certificate.custom_domain_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.domain_validation_record : record.fqdn]
+  region                  = "us-east-1"
 }
 
-resource "aws_apigatewayv2_domain_name" "apigw_custom_domain" {
-  domain_name = var.domain_name
+locals {
+  cf_origin_id  = aws_apigatewayv2_api.http_api.id
+  api_gw_id     = aws_apigatewayv2_api.http_api.id
+  api_gw_region = aws_apigatewayv2_api.http_api.region
+}
 
-  domain_name_configuration {
-    certificate_arn = aws_acm_certificate.custom_domain_cert.arn
-    endpoint_type   = "REGIONAL"
-    security_policy = "TLS_1_2"
+resource "aws_cloudfront_distribution" "cloudfront_distribution" {
+  origin {
+    domain_name = "${local.api_gw_id}.execute-api.${local.api_gw_region}.amazonaws.com"
+    origin_id   = local.cf_origin_id
+
+    custom_origin_config {
+      http_port              = "80"
+      https_port             = "443"
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
   }
 
-  depends_on = [aws_acm_certificate_validation.custom_domain_validation]
+  enabled         = true
+  is_ipv6_enabled = true
+  aliases         = [var.domain_name]
+
+  default_cache_behavior {
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "POST", "PATCH", "PUT", "DELETE"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = local.cf_origin_id
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+  }
+
+  viewer_certificate {
+    acm_certificate_arn = aws_acm_certificate.custom_domain_cert.arn
+    ssl_support_method = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
 }
 
-resource "aws_apigatewayv2_api_mapping" "apigw_mapping" {
-  api_id      = aws_apigatewayv2_api.http_api.id
-  domain_name = aws_apigatewayv2_domain_name.apigw_custom_domain.id
-  stage       = aws_apigatewayv2_stage.default.id
-}
-
-resource "aws_route53_record" "apigw_custom_domain_map" {
+resource "aws_route53_record" "cf_custom_domain_map" {
   zone_id = data.aws_route53_zone.custom_domain_zone.zone_id
-  name    = aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name
-  type    = "CNAME"
-  records = [aws_apigatewayv2_domain_name.apigw_custom_domain.domain_name_configuration[0].target_domain_name]
-  ttl     = 60
+  name    = var.domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.cloudfront_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cloudfront_distribution.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "cf_custom_domain_map_ipv6" {
+  zone_id = data.aws_route53_zone.custom_domain_zone.zone_id
+  name    = var.domain_name
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.cloudfront_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cloudfront_distribution.hosted_zone_id
+    evaluate_target_health = true
+  }
 }
