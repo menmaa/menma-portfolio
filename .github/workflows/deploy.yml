@@ -8,6 +8,7 @@ env:
   ECR_REPOSITORY_NAME: menma-portfolio
   ECR_IMAGE_TAG: fm
   DOMAIN_NAME: fotismakris.com
+  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
   TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
 
@@ -81,4 +82,6 @@ jobs:
             -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
             -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
+            -var 'cloudflare_account_id=${{ env.CLOUDFLARE_ACCOUNT_ID }}' \
+            -var 'cloudflare_api_token=${{ secrets.CLOUDFLARE_API_TOKEN }}' \
             -auto-approve

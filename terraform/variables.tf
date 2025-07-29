@@ -12,3 +12,12 @@ variable "domain_name" {
   description = "The custom domain name to be used for the API Gateway"
   type        = string
 }
+
+variable "cloudflare_account_id" {
+  type = string
+}
+
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
