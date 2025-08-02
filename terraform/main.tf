@@ -116,6 +116,25 @@ locals {
   api_gw_region = aws_apigatewayv2_api.http_api.region
 }
 
+resource "aws_cloudfront_origin_request_policy" "origin_request_policy" {
+  name = "AllViewerExceptOriginAndHostHeaders"
+
+  headers_config {
+    header_behavior = "allExcept"
+    headers {
+      items = ["Origin", "Host"]
+    }
+  }
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+
+  query_strings_config {
+    query_string_behavior = "all"
+  }
+}
+
 resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   origin {
     domain_name = "${local.api_gw_id}.execute-api.${local.api_gw_region}.amazonaws.com"
@@ -139,13 +158,8 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     target_origin_id       = local.cf_origin_id
     viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.origin_request_policy.id
   }
 
   viewer_certificate {
