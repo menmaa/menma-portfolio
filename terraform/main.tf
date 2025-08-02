@@ -47,6 +47,14 @@ resource "aws_lambda_function" "fotismakris_portfolio_function" {
   timeout       = 30
   memory_size   = 512
   architectures = ["x86_64"]
+
+  environment {
+    variables = {
+      AWS_SECRETS_ID     = var.aws_secret_manager_id
+      FROM_EMAIL_ADDRESS = var.lambda_from_email_address
+      TO_EMAIL_ADDRESS   = var.lambda_to_email_address
+    }
+  }
 }
 
 resource "aws_apigatewayv2_api" "http_api" {

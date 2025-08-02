@@ -5,13 +5,17 @@ on:
 
 env:
   AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  AWS_SECRET_MANAGER_ID: ${{ vars.AWS_SECRET_MANAGER_ID }}
   ECR_REPOSITORY_NAME: menma-portfolio
   ECR_IMAGE_TAG: fm
   DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
   TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
-  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  FROM_EMAIL_ADDRESS: ${{ vars.FROM_EMAIL_ADDRESS }}
+  TO_EMAIL_ADDRESS: ${{ vars.TO_EMAIL_ADDRESS }}
+  
 
 jobs:
   build:
@@ -86,4 +90,7 @@ jobs:
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
             -var 'cloudflare_account_id=${{ env.CLOUDFLARE_ACCOUNT_ID }}' \
             -var 'cloudflare_api_token=${{ secrets.CLOUDFLARE_API_TOKEN }}' \
+            -var 'aws_secret_manager_id=${{ env.AWS_SECRET_MANAGER_ID }}' \
+            -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
+            -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
             -auto-approve

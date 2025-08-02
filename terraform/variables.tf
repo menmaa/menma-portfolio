@@ -26,3 +26,15 @@ variable "cloudflare_api_token" {
   type      = string
   sensitive = true
 }
+
+variable "aws_secret_manager_id" {
+  type = string
+}
+
+variable "lambda_from_email_address" {
+  type = string
+}
+
+variable "lambda_to_email_address" {
+  type = string
+}

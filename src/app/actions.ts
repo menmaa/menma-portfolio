@@ -5,7 +5,7 @@ import { SESv2Client, SendEmailCommand, SendEmailCommandInput } from '@aws-sdk/c
 import z from 'zod/v4';
 
 type SchemaErrorType = "INVALID_REQUEST_BODY" | "CHALLENGE_VERIFICATION_FAILED" | "INTERNAL_SERVER_ERROR";
-type SecretType = 'TURNSTILE_SECRET' | 'HCAPTCHA_SECRET';
+type SecretType = "TURNSTILE_SECRET" | "HCAPTCHA_SECRET";
 
 export type ContactState = {
     success?: boolean;
@@ -13,6 +13,8 @@ export type ContactState = {
     message?: string;
     errors?: z.core.$ZodErrorTree<z.infer<typeof formSchema>>;
 };
+
+const sesClient = new SESv2Client({ region: 'us-east-1' });
 
 const formSchema = z.object({
     name: z.string()
@@ -26,11 +28,47 @@ const formSchema = z.object({
     'h-captcha-response': z.string().nullable()
 });
 
-const sesClient = new SESv2Client({ region: 'us-east-1' });
+const invalidRequestBodyError: ContactState = {
+    success: false,
+    code: "INVALID_REQUEST_BODY",
+    message: 'Invalid Request Body'
+};
+
+const challengeVerificationError: ContactState = {
+    success: false,
+    code: "CHALLENGE_VERIFICATION_FAILED",
+    message: "Challenge Verification Failed. Please try again."
+};
+
+const invalidChallengeError: ContactState = {
+    success: false,
+    code: "CHALLENGE_VERIFICATION_FAILED",
+    message: "Invalid Challenge Verification Method. Please try again."
+};
+
+const internalServerError: ContactState = {
+    success: false,
+    code: "INTERNAL_SERVER_ERROR",
+    message: "Internal Server Error"
+};
+
+const successState: ContactState = {
+    success: true,
+    message: 'Message Sent!'
+};
+
 let turnstileSecret = process.env.TURNSTILE_SECRET;
 let hcaptchaSecret = process.env.HCAPTCHA_SECRET;
 
 export async function contact(currentState: ContactState | null, formData: FormData): Promise<ContactState> {
+    const fromEmailAddress = process.env.FROM_EMAIL_ADDRESS;
+    const toEmailAddress = process.env.TO_EMAIL_ADDRESS;
+
+    if(!fromEmailAddress || !toEmailAddress) {
+        console.error("FROM_EMAIL_ADDRESS or TO_EMAIL_ADDRESS not provided");
+        return internalServerError;
+    }
+
     try {
         const result = await formSchema.safeParseAsync({
             name: formData.get('name'),
@@ -41,28 +79,27 @@ export async function contact(currentState: ContactState | null, formData: FormD
             'h-captcha-response': formData.get('h-captcha-response')
         });
         if (!result.success) {
-            const errors = z.treeifyError(result.error);
-            return { success: false, code: "INVALID_REQUEST_BODY", message: 'Invalid Request Body', errors };
+            return { ...invalidRequestBodyError, errors: z.treeifyError(result.error) };
         }
 
         if (result.data['cf-turnstile-response']) {
             const verify = await verifyTurnstileResponse(result.data['cf-turnstile-response']);
             if (!verify) {
-                return { success: false, code: "CHALLENGE_VERIFICATION_FAILED", message: "Challenge Verification Failed. Please try again." };
+                return challengeVerificationError;
             }
         } else if (result.data['h-captcha-response']) {
             const verify = await verifyHCaptchaResponse(result.data['h-captcha-response']);
             if (!verify) {
-                return { success: false, code: "CHALLENGE_VERIFICATION_FAILED", message: "Challenge Verification Failed. Please try again." };
+                return challengeVerificationError;
             }
         } else {
-            return { success: false, code: "CHALLENGE_VERIFICATION_FAILED", message: "Invalid Challenge Verification Method. Please try again." };
+            return invalidChallengeError;
         }
 
         const body: SendEmailCommandInput = {
-            FromEmailAddress: "\"Portfolio Contact Form\" <***REMOVED***>",
+            FromEmailAddress: fromEmailAddress,
             Destination: {
-                ToAddresses: ["***REMOVED***"]
+                ToAddresses: [toEmailAddress]
             },
             ReplyToAddresses: [result.data.email],
             Content: {
@@ -82,10 +119,10 @@ export async function contact(currentState: ContactState | null, formData: FormD
         };
 
         await sesClient.send(new SendEmailCommand(body));
-        return { success: true, message: 'Message Sent!' };
+        return successState;
     } catch (err) {
         console.error(err);
-        return { success: false, code: "INTERNAL_SERVER_ERROR", message: 'Internal Server Error' };
+        return internalServerError;
     }
 }
 
@@ -99,7 +136,7 @@ export async function verifyTurnstileResponse(response: string, ipAddress?: stri
     searchParams.append('response', response);
     if (ipAddress) searchParams.append('remoteip', ipAddress);
 
-    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    const res = await retryFetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -121,7 +158,7 @@ export async function verifyHCaptchaResponse(response: string, ipAddress?: strin
     searchParams.append('response', response);
     if (ipAddress) searchParams.append('remoteip', ipAddress);
 
-    const res = await fetch("https://api.hcaptcha.com/siteverify", {
+    const res = await retryFetch("https://api.hcaptcha.com/siteverify", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -135,13 +172,14 @@ export async function verifyHCaptchaResponse(response: string, ipAddress?: strin
 
 async function retrieveSecrets(secret: SecretType): Promise<string> {
     const region = process.env.AWS_REGION;
+    const secretId = process.env.AWS_SECRETS_ID;
 
-    if(!region) {
-        throw new Error('AWS_REGION not provided');
+    if(!region || !secretId) {
+        throw new Error('AWS_REGION or AWS_SECRETS_ID not provided');
     }
 
     const client = new SecretsManagerClient({ region });
-    const data = await client.send(new GetSecretValueCommand({ SecretId: '***REMOVED***' }));
+    const data = await client.send(new GetSecretValueCommand({ SecretId: secretId }));
 
     if('SecretString' in data) {
         const secrets = JSON.parse(data.SecretString as string);
@@ -152,4 +190,35 @@ async function retrieveSecrets(secret: SecretType): Promise<string> {
     }
 
     throw new Error('Failed to retrieve AWS Secret String');
+}
+
+async function retryFetch(
+    url: string | URL | Request,
+    options: RequestInit = {},
+    retries: number = 3,
+    retryDelay: number = 1000
+): Promise<Response> {
+    const errors: Error[] = [];
+
+    while (errors.length < retries) {
+        try {
+            return await fetch(url, options);
+        } catch (error) {
+            // Add the error to the list of errors
+            errors.push(error as Error);
+
+            // If the number of errors is less than the number of retries,
+            // wait for the specified delay before retrying using expontential backoff
+            if (errors.length < retries) {
+                await sleep(retryDelay * errors.length);
+            }
+        }
+    }
+
+    // If we reach here, it means all retries have failed.
+    throw new Error("Max retries reached.");
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
