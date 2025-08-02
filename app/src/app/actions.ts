@@ -26,7 +26,7 @@ const formSchema = z.object({
     'h-captcha-response': z.string().nullable()
 });
 
-const sesClient = new SESv2Client({ region: process.env.AWS_REGION });
+const sesClient = new SESv2Client({ region: 'us-east-1' });
 let turnstileSecret = process.env.TURNSTILE_SECRET;
 let hcaptchaSecret = process.env.HCAPTCHA_SECRET;
 
