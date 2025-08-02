@@ -158,7 +158,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     target_origin_id       = local.cf_origin_id
     viewer_protocol_policy = "redirect-to-https"
 
-    cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
     origin_request_policy_id = aws_cloudfront_origin_request_policy.origin_request_policy.id
   }
 

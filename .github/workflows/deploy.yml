@@ -7,10 +7,11 @@ env:
   AWS_REGION: eu-central-1
   ECR_REPOSITORY_NAME: menma-portfolio
   ECR_IMAGE_TAG: fm
-  DOMAIN_NAME: fotismakris.com
+  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
   TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
 
 jobs:
   build:
@@ -28,7 +29,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ***REMOVED***
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
@@ -41,7 +42,7 @@ jobs:
       - name: Build Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: ./app
+          context: ./
           secret-envs: |
             turnstile_site_key=TURNSTILE_SITE_KEY
             hcaptcha_site_key=HCAPTCHA_SITE_KEY
@@ -71,7 +72,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ***REMOVED***
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Initialize and Deploy Terraform
@@ -79,6 +80,7 @@ jobs:
           cd terraform
           terraform init
           terraform apply \
+            -var 'aws_region=${{ env.AWS_REGION }}' \
             -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
             -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
             -var 'domain_name=${{ env.DOMAIN_NAME }}' \
