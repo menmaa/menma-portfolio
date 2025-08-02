@@ -209,7 +209,7 @@ resource "aws_route53_record" "cf_custom_domain_map_ipv6" {
 
 resource "cloudflare_turnstile_widget" "form_turnstile_widget" {
   account_id = var.cloudflare_account_id
-  name       = "menma.dev contact form"
-  domains    = ["fotismakris.com", "menma.dev"]
+  name       = "fotismakris.com contact form"
+  domains    = ["fotismakris.com"]
   mode       = "invisible"
 }
