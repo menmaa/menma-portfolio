@@ -83,7 +83,6 @@ jobs:
 
       - name: Initialize and Deploy Terraform
         run: |
-          cd terraform/production
           terraform init
           terraform apply \
             -var 'aws_region=${{ env.AWS_REGION }}' \
@@ -96,7 +95,9 @@ jobs:
             -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
             -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
             -auto-approve
+        working-directory: ./terraform/preview
 
       - name: Export API Url from Terraform
         id: tf-output
         run: echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
+        working-directory: ./terraform/preview
