@@ -1,0 +1,79 @@
+name: Build Preview Image and Deploy to Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  AWS_SECRET_MANAGER_ID: ${{ vars.AWS_SECRET_MANAGER_ID }}
+  ECR_REPOSITORY_NAME: menma-portfolio-preview
+  ECR_IMAGE_TAG: latest
+  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+  TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+  HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
+  FROM_EMAIL_ADDRESS: ${{ vars.FROM_EMAIL_ADDRESS }}
+  TO_EMAIL_ADDRESS: ${{ vars.TO_EMAIL_ADDRESS }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: preview
+    url: ${{ steps.tf-output.outputs.api_url }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps: 
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./
+          secret-envs: |
+            turnstile_site_key=TURNSTILE_SITE_KEY
+            hcaptcha_site_key=HCAPTCHA_SITE_KEY
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NAME }}:${{ env.ECR_IMAGE_TAG }}
+          platforms: linux/amd64
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Initialize and Deploy Terraform
+        run: |
+          cd terraform/preview
+          terraform init
+          terraform apply \
+            -var 'aws_region=${{ env.AWS_REGION }}' \
+            -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
+            -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
+            -var 'cloudflare_account_id=${{ env.CLOUDFLARE_ACCOUNT_ID }}' \
+            -var 'cloudflare_api_token=${{ secrets.CLOUDFLARE_API_TOKEN }}' \
+            -var 'aws_secret_manager_id=${{ env.AWS_SECRET_MANAGER_ID }}' \
+            -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
+            -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
+            -auto-approve
+
+      - name: Export API Url from Terraform
+        id: tf-output
+        run: echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT

@@ -13,7 +13,7 @@ terraform {
 
   backend "s3" {
     bucket         = "hoshinomenma"
-    key            = "portfolio/infrastructure/state/terraform.tfstate"
+    key            = "portfolio/infrastructure/preview/state/terraform.tfstate"
     region         = "eu-central-1"
     encrypt        = true
     dynamodb_table = "MenmaPortfolioTerraformLockId"
