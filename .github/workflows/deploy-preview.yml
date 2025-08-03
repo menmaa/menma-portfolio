@@ -21,8 +21,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: preview
-    url: ${{ steps.tf-output.outputs.api_url }}
+    environment: 
+      name: preview
+      url: ${{ steps.tf-output.outputs.api_url }}
 
     permissions:
       id-token: write
