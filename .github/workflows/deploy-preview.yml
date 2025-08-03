@@ -3,7 +3,7 @@ name: Build Preview Image and Deploy to Lambda
 on:
   push:
     branches:
-      - main
+      - master
 
 env:
   AWS_REGION: eu-central-1
