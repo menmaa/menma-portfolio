@@ -60,7 +60,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Initialize and Deploy Terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Initialize and Deploy Terraform Plan
         run: |
           cd terraform/preview
           terraform init
