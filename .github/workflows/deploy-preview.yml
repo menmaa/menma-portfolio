@@ -11,7 +11,6 @@ env:
   AWS_SECRET_MANAGER_ID: ${{ vars.AWS_SECRET_MANAGER_ID }}
   ECR_REPOSITORY_NAME: menma-portfolio-preview
   ECR_IMAGE_TAG: latest
-  DOMAIN_NAME: ${{ vars.DOMAIN_NAME }}
   CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
   TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
   HCAPTCHA_SITE_KEY: ${{ vars.HCAPTCHA_SITE_KEY }}
@@ -65,7 +64,6 @@ jobs:
 
       - name: Initialize and Deploy Terraform Plan
         run: |
-          cd terraform/preview
           terraform init
           terraform apply \
             -var 'aws_region=${{ env.AWS_REGION }}' \
@@ -77,7 +75,9 @@ jobs:
             -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
             -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
             -auto-approve
+        working-directory: ./terraform/preview
 
       - name: Export API Url from Terraform
         id: tf-output
         run: echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
+        working-directory: ./terraform/preview
