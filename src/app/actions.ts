@@ -200,7 +200,7 @@ async function retryFetch(
 ): Promise<Response> {
     const errors: Error[] = [];
 
-    while (errors.length < retries) {
+    while (errors.length <= retries) {
         try {
             return await fetch(url, options);
         } catch (error) {
@@ -208,9 +208,9 @@ async function retryFetch(
             errors.push(error as Error);
 
             // If the number of errors is less than the number of retries,
-            // wait for the specified delay before retrying using expontential backoff
-            if (errors.length < retries) {
-                await sleep(retryDelay * errors.length);
+            // wait for the specified delay before retrying using exponential backoff
+            if (errors.length <= retries) {
+                await sleep(retryDelay * Math.pow(2, errors.length - 1));
             }
         }
     }
