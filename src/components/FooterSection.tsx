@@ -30,7 +30,7 @@ export default function Footer() {
 
           <Stack direction="row" spacing={1}>
             <IconButton
-              href="mailto:***REMOVED***"
+              href="mailto:contact@fotismakris.com"
               color="inherit"
               aria-label="Email"
               sx={{ color: 'text.secondary' }}

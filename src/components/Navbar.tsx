@@ -90,7 +90,7 @@ export default function AppNavBar() {
               alignItems: 'center',
             }}
           >
-            <IconButton color="primary" size="small" href="mailto:***REMOVED***" aria-label="Email Button" target="_blank" rel="noopener">
+            <IconButton color="primary" size="small" href="mailto:contact@fotismakris.com" aria-label="Email Button" target="_blank" rel="noopener">
               <EmailIcon fontSize="small" />
             </IconButton>
             <IconButton color="primary" size="small" href="https://github.com/menmaa" aria-label="GitHub Button" target="_blank" rel="noopener">
@@ -130,7 +130,7 @@ export default function AppNavBar() {
                 <Divider sx={{ my: 3 }} />
 
                 <Stack direction="row">
-                  <IconButton color="primary" href="mailto:***REMOVED***" aria-label="Email Button" target="_blank" rel="noopener">
+                  <IconButton color="primary" href="mailto:contact@fotismakris.com" aria-label="Email Button" target="_blank" rel="noopener">
                     <EmailIcon />
                   </IconButton>
                   <IconButton color="primary"href="https://github.com/menmaa" aria-label="GitHub Button" target="_blank" rel="noopener">
