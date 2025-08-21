@@ -25,11 +25,12 @@ type Project = {
 
 const projects: Project[] = [
   {
-    title: 'Aurora Link',
+    title: 'Project Aurora',
     description:
-      'A discord-like real-time communications social media platform for everyone. Currently under development.',
-    stack: ['Node.js', 'Express.js', 'REST API', 'Redis', 'MongoDB', 'WebSockets', 'Docker', 'AWS', 'Microservices', 'Apache Kafka'],
-    demoUrl: null
+      'A discord-like real-time communications social media platform that aims to deliver a secure, resilient and exquisite performance at huge scale. Currently under development.',
+    stack: ['Java', 'Spring WebFlux', 'REST API', 'Redis', 'MongoDB', 'WebSockets', 'Docker', 'AWS', 'Microservices', 'Apache Kafka'],
+    demoUrl: null,
+    sourceUrl: 'https://github.com/menmaa/aurora'
   },
   {
     title: 'Game Launcher & Auth System',
@@ -42,7 +43,6 @@ const projects: Project[] = [
     description:
       'A secure user account system with registration, login, MFA, and password resets. Integrated Stripe for payments and custom Twitch drops API.',
     stack: ['React', 'Node.js', 'Express.js', 'REST API', 'MySQL', 'Redis', 'Twitch API', 'Stripe API', 'Webhooks', 'Cloudflare'],
-    demoUrl: null
   },
   {
     title: 'Game Statistics Web UI',
