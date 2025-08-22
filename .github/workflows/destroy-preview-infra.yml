@@ -1,0 +1,71 @@
+name: Destroy Preview AWS Infrastructure
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+  AWS_SECRET_MANAGER_ID: ${{ vars.AWS_SECRET_MANAGER_ID }}
+  ECR_REPOSITORY_NAME: menma-portfolio
+  ECR_IMAGE_TAG: latest-preview
+  FROM_EMAIL_ADDRESS: ${{ vars.FROM_EMAIL_ADDRESS }}
+  TO_EMAIL_ADDRESS: ${{ vars.TO_EMAIL_ADDRESS }}
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    environment: preview
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Initialize and Destroy Terraform Infrastructure
+        run: |
+          terraform init
+          terraform destroy \
+            -var 'aws_region=${{ env.AWS_REGION }}' \
+            -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
+            -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
+            -var 'aws_secret_manager_id=${{ env.AWS_SECRET_MANAGER_ID }}' \
+            -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
+            -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
+            -auto-approve
+        working-directory: ./terraform/preview
+  
+  cleanup_deployment:
+    runs-on: ubuntu-latest
+    needs: destroy
+    if: always()
+    
+    steps:
+      - name: Get Deployment ID
+        id: get-deployment
+        run: |
+          DEPLOYMENT_ID=$(gh api repos/${{ github.repository }}/deployments \
+            --method GET \
+            --field sha=${{ github.sha }} \
+            --field ref=${{ github.ref }} \
+            --field environment=preview \
+            --jq '.[0].id // empty')
+
+          echo "Found Deployment ID: $DEPLOYMENT_ID"
+          echo "deployment_id=$DEPLOYMENT_ID" >> $GITHUB_OUTPUT
+
+      - name: Deactivate Deployment
+        if: always() && steps.get-deployment.outputs.deployment_id != ''
+        run: |
+          gh api repos/${{ github.repository }}/deployments/${{ steps.get-deployment.outputs.deployment_id }}/statuses \
+            --method POST
+            --field environment=preview
+            --field state=inactive
+
+      - name: Delete Deployment
+        if: always() && steps.get-deployment.outputs.deployment_id != ''
+        run: | 
+          gh api repos/${{ github.repository }}/deployments/${{ steps.get-deployment.outputs.deployment_id }} \
+            --method DELETE

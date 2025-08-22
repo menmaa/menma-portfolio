@@ -13,15 +13,6 @@ variable "image_tag" {
   type        = string
 }
 
-variable "cloudflare_account_id" {
-  type = string
-}
-
-variable "cloudflare_api_token" {
-  type      = string
-  sensitive = true
-}
-
 variable "aws_secret_manager_id" {
   type = string
 }
