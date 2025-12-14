@@ -71,8 +71,6 @@ jobs:
             -var 'aws_region=${{ env.AWS_REGION }}' \
             -var 'image_repository=${{ env.ECR_REPOSITORY_NAME }}' \
             -var 'image_tag=${{ env.ECR_IMAGE_TAG }}' \
-            -var 'cloudflare_account_id=${{ env.CLOUDFLARE_ACCOUNT_ID }}' \
-            -var 'cloudflare_api_token=${{ secrets.CLOUDFLARE_API_TOKEN }}' \
             -var 'aws_secret_manager_id=${{ env.AWS_SECRET_MANAGER_ID }}' \
             -var 'lambda_from_email_address=${{ env.FROM_EMAIL_ADDRESS }}' \
             -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
