@@ -49,6 +49,3 @@ jobs:
             -var 'lambda_to_email_address=${{ env.TO_EMAIL_ADDRESS }}' \
             -auto-approve
         working-directory: ./terraform/preview
-  
-          gh api repos/${{ github.repository }}/deployments/${{ steps.get-deployment.outputs.deployment_id }} \
-            --method DELETE
