@@ -21,6 +21,8 @@ const categories: SkillCategory[] = [
       { name: 'C/C++' },
       { name: 'C#' },
       { name: 'Java' },
+      { name: 'Kotlin' },
+      { name: 'Go' },
       { name: 'SQL' }
     ]
   },
@@ -42,7 +44,7 @@ const categories: SkillCategory[] = [
     title: 'REST APIs',
     entries: [
       { name: 'Endpoint Design & Deployment' },
-      { name: 'Authentication/Authorization (API Keys, OAuth2, JWT, MFA, Custom)' },
+      { name: 'Authentication & Authorization (API Keys, OpenID, OAuth2, JWT, MFA, AWS Cognito, Custom)' },
       { name: 'Rate Limiting' },
       { name: 'Idempotency, Response Caching' },
       { name: 'CORS' },
@@ -68,8 +70,9 @@ const categories: SkillCategory[] = [
       { name: 'MySQL/MariaDB' },
       { name: 'MongoDB' },
       { name: 'SQL Server' },
-      { name: 'Aurora RDS (AWS)' },
-      { name: 'Redis' }
+      { name: 'AWS Aurora' },
+      { name: 'AWS DynamoDB' },
+      { name: 'Redis' },
     ]
   },
   {
@@ -77,14 +80,16 @@ const categories: SkillCategory[] = [
     entries: [
       { name: 'AWS (EC2, ECS, VPC, S3, ELB(ALB/NLB), API Gateway, Aurora RDS, ElastiCache, Lambda, IAM)' },
       { name: 'Azure (Virtual Machines, App Services, Static Web Apps, Storage Accounts)' },
-      { name: 'Cloudflare (DNS, CDN, R2, Stream, Pages)' }
+      { name: 'Cloudflare (DNS, CDN, R2, Stream, Pages, Images)' }
     ]
   },
   {
     title: "Message Queues & Data Streaming",
     entries: [
       { name: "RabbitMQ" },
-      { name: "Apache Kafka" }
+      { name: "Apache Kafka" },
+      { name: "AWS SQS" },
+      { name: "Amazon Kinesis Data Streams" }
     ]
   },
   {
@@ -100,11 +105,19 @@ const categories: SkillCategory[] = [
   {
     title: "Planning, Testing & Other Tools",
     entries: [
-      { name: "Git (GitHub)" },
-      { name: "CI/CD (Github Actions)" },
+      { name: "Git (GitHub, AWS CodeCommit)" },
+      { name: "CI/CD (Github Actions, AWS CodeBuild/CodePipeline)" },
       { name: "Agile (Jira, Azure DevOps, Trello)" },
       { name: "Unit/Integration Testing (Jest, Vitest, Postman)" },
-      { name: "Terraform" }
+      { name: "Terraform" },
+      { name: "E2E Testing (Playwright)" },
+      { name: "AI Agents, Claude Code" }
+    ]
+  },
+  {
+    title: "Game Development",
+    entries: [
+      { name: "Unreal Engine 5" }
     ]
   }
 ];
