@@ -25,12 +25,35 @@ type Project = {
 
 const projects: Project[] = [
   {
+    title: 'Apartment Application Bot',
+    description:
+      'An automated search application with multiple instances which bypasses common anti-bot systems and submits an application, when it finds an appropriate apartment.',
+    stack: ['Node.js', 'Playwright', 'Telegram API', 'SQLite', 'AWS S3']
+  },
+  {
+    title: 'SMS Forwarder',
+    description:
+      'An Android application which forwards received SMS messages to other devices using Firebase Cloud Messaging.',
+    stack: ['Kotlin', 'Android SDK', 'AWS Cognito', 'DynamoDB', 'REST API', 'Firebase Cloud Messaging']
+  },
+  {
+    title: 'Animey',
+    description:
+      'A download system which, given an input URL for an anime series season, would fetch all available episodes and upload them to S3, with embedded English subtitles.',
+    stack: ['Go', 'AWS Step Functions', 'AWS Lambda', 'AWS ECS Tasks', 'AWS S3', 'ffmpeg'],
+    sourceUrl: 'https://github.com/menmaa/animey'
+  },
+  {
     title: 'Project Aurora',
     description:
-      'A discord-like real-time communications social media platform that aims to deliver a secure, resilient and exquisite performance at huge scale. Currently under development.',
-    stack: ['Java', 'Spring WebFlux', 'REST API', 'Redis', 'MongoDB', 'WebSockets', 'Docker', 'AWS', 'Microservices', 'Apache Kafka'],
-    demoUrl: null,
-    sourceUrl: 'https://github.com/menmaa/aurora'
+      'A discord-like real-time communications social media platform that aims to deliver a secure, resilient and exquisite performance at huge scale.',
+    stack: ['Node.js', 'REST API', 'Redis', 'MongoDB', 'WebSockets', 'Docker', 'AWS', 'Microservices'],
+  },
+  {
+    title: 'Game Server Emulator',
+    description:
+      'A game server emulator for a popular massively-multiplayer online role-playing game, using asynchronous, event-driven architecture, and a predetermined thread pool to support thousands of concurrent connections.',
+    stack: ['C/C++', 'Reverse Engineering']
   },
   {
     title: 'Game Launcher & Auth System',
@@ -52,16 +75,16 @@ const projects: Project[] = [
     demoUrl: 'https://moongourd.menma.dev'
   },
   {
-    title: 'Menmu Discord Bot',
-    description: 'A simple discord music bot with support for YouTube playback and live streams.',
-    stack: ['Java', 'Discord4j', 'Lavalink', 'YouTube API', 'Docker', 'AWS ECS'],
-    sourceUrl: 'https://github.com/menmaa/MenmuDiscordBot'
-  },
-  {
     title: 'Internal Developer Tools',
     description:
       'A suite of internal tools for content creation, update deployment, and analytics aggregation, enabling faster iteration and fewer bugs.',
     stack: ['Node.js', 'React', 'C++', 'CLI Tools', 'Discord API', 'AWS', 'Azure'],
+  },
+  {
+    title: 'Menmu Discord Bot',
+    description: 'A simple discord music bot with support for YouTube playback and live streams.',
+    stack: ['Java', 'Discord4j', 'Lavalink', 'YouTube API', 'Docker', 'AWS ECS'],
+    sourceUrl: 'https://github.com/menmaa/MenmuDiscordBot'
   },
 ];
 
@@ -109,10 +132,10 @@ export default function ProjectsSection() {
                       href={project.sourceUrl}
                       target="_blank"
                       rel="noopener"
-                      endIcon={<OpenInNewIcon/>}
+                      endIcon={<OpenInNewIcon />}
                       fullWidth
                     >Source Code</Button>}
-                    
+
                     {project.url && <Button
                       variant="outlined"
                       LinkComponent={CustomLink}
@@ -126,7 +149,7 @@ export default function ProjectsSection() {
                       href={project.demoUrl}
                       target="_blank"
                       rel="noopener"
-                      endIcon={<OpenInNewIcon/>}
+                      endIcon={<OpenInNewIcon />}
                       fullWidth
                     >Live Demo</Button>}
 
