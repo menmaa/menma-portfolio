@@ -23,7 +23,7 @@ export default function SummarySection() {
           </Typography>
 
           <Typography variant="body1" mb={3}>
-            I am a dedicated software engineer with 4+ years of professional experience as the Lead Software Engineer and founder of a small game publishing company.
+            I am a dedicated software engineer with 5+ years of professional experience as the Lead Software Engineer and founder of a small game publishing company.
           </Typography>
 
           <Typography variant="body1" mb={3}>
